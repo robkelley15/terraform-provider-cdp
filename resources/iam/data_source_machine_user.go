@@ -39,41 +39,25 @@ func (m *machineUserDataSource) Configure(_ context.Context, req datasource.Conf
 
 // Metadata implements datasource.DataSourceWithConfigure.
 func (m *machineUserDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_iam_machine_user"
 }
 
 // Schema implements datasource.DataSourceWithConfigure.
 func (m *machineUserDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "A machine user account provides programmatic access to CDP.",
 		Attributes: map[string]schema.Attribute{
-			"id": schema.StringAttribute{
-				Computed: true,
-			},
-			"machineUserName": schema.StringAttribute{
-				MarkdownDescription: "The machine user name.",
-				Required:            true,
-			},
-			"crn": schema.StringAttribute{
-				MarkdownDescription: "The CRN of the user.",
-				Computed:            true,
-			},
-			"creationDate": schema.StringAttribute{
-				MarkdownDescription: "The date when this machine user was created.",
-				Required:            true,
-			},
-			"status": schema.StringAttribute{
-				MarkdownDescription: "The current status of the machine user.",
-				Optional:            true,
-			},
-			"workloadUsername": schema.StringAttribute{
-				MarkdownDescription: "The username used in all the workload clusters of the machine user.",
-				Optional:            true,
-			},
-			"workloadPasswordDetails": schema.StringAttribute{
-				MarkdownDescription: "Information about the workload password for the machine user.",
-				Optional:            true,
-			},
+			"id":                        schema.StringAttribute{Computed: true},
+			"machine_user_name":         schema.StringAttribute{MarkdownDescription: "The machine user name.", Required: true},
+			"crn":                       schema.StringAttribute{MarkdownDescription: "The CRN of the user.", Computed: true},
+			"creation_date":             schema.StringAttribute{MarkdownDescription: "The date when this machine user was created.", Computed: true},
+			"status":                    schema.StringAttribute{MarkdownDescription: "The current status of the machine user.", Computed: true},
+			"workload_username":         schema.StringAttribute{MarkdownDescription: "The username used in all the workload clusters of the machine user.", Optional: true},
+			"workload_password_details": schema.StringAttribute{MarkdownDescription: "Information about the workload password for the machine user.", Optional: true},
 		},
+		Blocks:              map[string]schema.Block{},
+		Description:         "",
+		MarkdownDescription: "A machine user account provides programmatic access to CDP.",
+		DeprecationMessage:  "",
 	}
 }
 

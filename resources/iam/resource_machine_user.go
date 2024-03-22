@@ -37,12 +37,12 @@ type machineUserResource struct {
 
 type machineUserModel struct {
 	ID                      types.String `tfsdk:"id"`
-	machineUserName         types.String `tfsdk:"group_name"`
+	MachineUserName         types.String `tfsdk:"machine_user_name"`
 	Crn                     types.String `tfsdk:"crn"`
-	creationDate            types.String `tfsdk:"creation_date"`
-	status                  types.String `tfsdk:"status"`
-	workloadUsername        types.String `tfsdk:"workload_username"`
-	workloadPasswordDetails types.String `tfsdk:"workload_password_details"`
+	CreationDate            types.String `tfsdk:"creation_date"`
+	Status                  types.String `tfsdk:"status"`
+	WorkloadUsername        types.String `tfsdk:"workload_username"`
+	WorkloadPasswordDetails types.String `tfsdk:"workload_password_details"`
 }
 
 func NewMachineUserResource() resource.Resource {
@@ -60,7 +60,7 @@ func (r *machineUserResource) Schema(_ context.Context, _ resource.SchemaRequest
 			"id": schema.StringAttribute{
 				Computed: true,
 			},
-			"machineUserName": schema.StringAttribute{
+			"machine_user_name": schema.StringAttribute{
 				MarkdownDescription: "The machine user name.",
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
@@ -71,19 +71,19 @@ func (r *machineUserResource) Schema(_ context.Context, _ resource.SchemaRequest
 				MarkdownDescription: "The CRN of the user.",
 				Computed:            true,
 			},
-			"creationDate": schema.StringAttribute{
+			"creation_date": schema.StringAttribute{
 				MarkdownDescription: "The date when this machine user was created.",
-				Required:            true,
+				Computed:            true,
 			},
 			"status": schema.StringAttribute{
 				MarkdownDescription: "The current status of the machine user.",
-				Optional:            true,
+				Computed:            true,
 			},
-			"workloadUsername": schema.StringAttribute{
+			"workload_username": schema.StringAttribute{
 				MarkdownDescription: "The username used in all the workload clusters of the machine user.",
 				Optional:            true,
 			},
-			"workloadPasswordDetails": schema.StringAttribute{
+			"workload_password_details": schema.StringAttribute{
 				MarkdownDescription: "Information about the workload password for the machine user.",
 				Optional:            true,
 			},
@@ -108,7 +108,7 @@ func (r *machineUserResource) Create(ctx context.Context, req resource.CreateReq
 
 	params := operations.NewCreateMachineUserParamsWithContext(ctx)
 	params.WithInput(&iammodels.CreateMachineUserRequest{
-		MachineUserName: data.machineUserName.ValueStringPointer(),
+		MachineUserName: data.MachineUserName.ValueStringPointer(),
 	})
 
 	responseOk, err := client.Operations.CreateMachineUser(params)
@@ -121,7 +121,7 @@ func (r *machineUserResource) Create(ctx context.Context, req resource.CreateReq
 	}
 
 	data.Crn = types.StringPointerValue(responseOk.Payload.MachineUser.Crn)
-	data.ID = data.machineUserName
+	data.ID = data.MachineUserName
 
 	// Save data into Terraform state
 	diags = resp.State.Set(ctx, data)
@@ -136,7 +136,7 @@ func sharedMachineUserRead(ctx context.Context, client *client.Iam, state *machi
 		return
 	}
 
-	machineUserName := state.machineUserName.ValueString()
+	machineUserName := state.MachineUserName.ValueString()
 	params := operations.NewListMachineUsersParamsWithContext(ctx)
 	params.WithInput(&iammodels.ListMachineUsersRequest{MachineUserNames: []string{machineUserName}})
 	listMachineUsersOk, err := client.Operations.ListMachineUsers(params)
@@ -157,7 +157,7 @@ func sharedMachineUserRead(ctx context.Context, client *client.Iam, state *machi
 	mu := machineUsers[0]
 
 	state.Crn = types.StringPointerValue(mu.Crn)
-	state.ID = state.machineUserName
+	state.ID = state.MachineUserName
 }
 func (r *machineUserResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
